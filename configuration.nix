@@ -152,6 +152,36 @@
     };
   };
 
+  systemd.services.sync-archlinux-arm = {
+    script = ''
+      rsync -rlptH --safe-links --delete-delay --delay-updates rsync://de3.mirror.archlinuxarm.org/archlinux-arm /data/mirror/archlinux-arm
+    '';
+    path = [
+      pkgs.rsync
+    ];
+    startAt = "minutely";
+    serviceConfig = {
+      Type = "oneshot";
+      User = config.users.users.rsync-client.name;
+      Group = config.users.users.rsync-client.group;
+    };
+  };
+
+  systemd.services.sync-archriscv = {
+    script = ''
+      rsync -rlptH --safe-links --delete-delay --delay-updates rsync://archriscv.felixc.at/archriscv /data/mirror/archriscv
+    '';
+    path = [
+      pkgs.rsync
+    ];
+    startAt = "minutely";
+    serviceConfig = {
+      Type = "oneshot";
+      User = config.users.users.rsync-client.name;
+      Group = config.users.users.rsync-client.group;
+    };
+  };
+
   services.nginx = {
     enable = true;
     virtualHosts."mirror.ufscar.br" = {
