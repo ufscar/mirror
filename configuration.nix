@@ -143,6 +143,26 @@
     };
   };
 
+  services.nginx = {
+    enable = true;
+    virtualHosts."mirror.ufscar.br" = {
+      enableACME = true;
+      forceSSL = false;
+      addSSL = true;
+      default = true;
+      root = "/data/mirror";
+      locations = {
+        "/" = {
+          extraConfig = ''
+            autoindex on;
+          '';
+        };
+      };
+    };
+  };
+  security.acme.defaults.email = "admin@ufscar.br";
+  security.acme.acceptTerms = true;
+
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
   # accidentally delete configuration.nix.
