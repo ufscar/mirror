@@ -76,6 +76,13 @@
   #   keyMap = "us";
   #   useXkbConfig = true; # use xkb.options in tty.
   # };
+  users.users.rsync-client = {
+    isSystemUser = true;
+    home = "/data/mirror";
+    createHome = false;
+    group = "rsync-client";
+  };
+  users.groups.rsync-client = {};
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.matias = {
@@ -120,6 +127,21 @@
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   networking.firewall.enable = false;
+
+  systemd.services.sync-archlinux = {
+    script = lib.readFile ./scripts/sync-archlinux.sh;
+    path = [
+      pkgs.diffutils
+      pkgs.rsync
+      pkgs.curl
+    ];
+    startAt = "*-*-* *:*:00,15,30,45";
+    serviceConfig = {
+      Type = "oneshot";
+      User = config.users.users.rsync-client.name;
+      Group = config.users.users.rsync-client.group;
+    };
+  };
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
