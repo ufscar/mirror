@@ -206,6 +206,20 @@
         };
       };
     };
+    virtualHosts."br.mirror.archlinuxarm.org" = {
+      enableACME = false;  # change later
+      forceSSL = false;
+      addSSL = false;  # change later
+      root = "/data/mirror/archlinux-arm";
+      locations = {
+        "/" = {
+          extraConfig = ''
+            autoindex on;
+            autoindex_exact_size off;
+          '';
+        };
+      };
+    };
   };
   security.acme.defaults.email = "admin@ufscar.br";
   security.acme.acceptTerms = true;
