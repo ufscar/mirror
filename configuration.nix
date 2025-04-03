@@ -92,6 +92,13 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMSMWXqe7XSDcfoeMBUfl4XkerMBw4ZUuLNbJsJfwfay"
     ];
   };
+  users.users.fabiors = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" ];
+    openssh.authorizedKeys.keys = [
+      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC/URhEZ6RyyfEmrvg1D13Ri+K0CsmxEPvKMsSOO9pWPEFYrTERZz3mPEi21jI2onkz31/YyMCBRhUXJxc4bF/fJ8NbtEQcFYkFUr/DvZ3GhU4GTKAD9ihUASpFbEuQRvPfvmIm1XHY4sOhPejOS0UBiDvdnX6gCS7qPiaoRrt2ykpcLSpUwcgodqwj5dgehrx5Jwma41YAwNava7sjQQub6QofIXlsoPtuSZMbuncc2u1HEvEoSfCotDftZ4yQ6WL+HgvR4J4Jv6B9zBXJMEbeBEDhHxXOxiZMAURvGWiDmgF7YROos1dk/sEi2F08Zugr4uCPSUYZdASNR/y+yMPson00DtCfOQ1GPoc7f7+JvkuAGWQUBUrsr5fatJyxYtC9XnslEwssStbDMatU39DFl9mMQiyj2MwICdm+15HBRsBVDEomAhWx/Q5wWaEOytHCAjy4PfO7Xtdw402jX0YBFB8A0Dn0Lmbjv0/wDbCqegaU0rtIXdpiAl+/VAgiYUJO3ors0RdUbMyQYNgXLpzh0wpo9TDC8PfsNaJ5nxBNH7E6pQc7F87RYzDbpcIk9/JDdqWwH+6v+6EXrKao+nXg1oJMUhOpeIx0EVTMGtktwx80rL1llLvWAloOKqxvEGingc3wR/Oh5ozaL+q082K7t+UWzYuLuvddhmKKcyNJoQ=="
+    ];
+  };
   users.users.pedrohlc = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
