@@ -79,7 +79,8 @@
   users.users.rsync-client = {
     isSystemUser = true;
     home = "/data/mirror";
-    createHome = false;
+    createHome = true;
+    homeMode = "755";
     group = "rsync-client";
   };
   users.groups.rsync-client = {};
@@ -143,6 +144,13 @@
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   networking.firewall.enable = false;
+
+  services.syncthing = {
+    enable = true;
+    dataDir = "/data/syncthing";
+    openDefaultPorts = false;
+  };
+  users.users.syncthing.homeMode = "755";
 
   systemd.services.sync-archlinux = {
     script = lib.readFile ./scripts/sync-archlinux.sh;
