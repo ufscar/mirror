@@ -147,7 +147,7 @@
 
   services.syncthing = {
     enable = true;
-    dataDir = "/data/syncthing";
+    dataDir = "/home/syncthing";
     openDefaultPorts = false;
   };
   users.users.syncthing.homeMode = "755";
