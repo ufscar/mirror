@@ -197,6 +197,36 @@
     };
   };
 
+  systemd.services.sync-debian = {
+    script = ''
+      rsync -rlptH --safe-links --delete-delay --delay-updates rsync://ubuntu.c3sl.ufpr.br/debian /data/mirror/debian
+    '';
+    path = [
+      pkgs.rsync
+    ];
+    startAt = "hourly";
+    serviceConfig = {
+      Type = "oneshot";
+      User = config.users.users.rsync-client.name;
+      Group = config.users.users.rsync-client.group;
+    };
+  };
+
+  systemd.services.sync-ubuntu = {
+    script = ''
+      rsync -rlptH --safe-links --delete-delay --delay-updates rsync://ubuntu.c3sl.ufpr.br/ubuntu /data/mirror/ubuntu
+    '';
+    path = [
+      pkgs.rsync
+    ];
+    startAt = "hourly";
+    serviceConfig = {
+      Type = "oneshot";
+      User = config.users.users.rsync-client.name;
+      Group = config.users.users.rsync-client.group;
+    };
+  };
+
   services.nginx = {
     enable = true;
     virtualHosts."mirror.ufscar.br" = {
