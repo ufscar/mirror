@@ -199,7 +199,7 @@
 
   systemd.services.sync-debian = {
     script = ''
-      rsync -rlptH --safe-links --delete-delay --delay-updates rsync://ubuntu.c3sl.ufpr.br/debian /data/mirror/debian
+      rsync -rlptH --safe-links --delete-delay --delay-updates rsync://debian.c3sl.ufpr.br/debian /data/mirror/debian
     '';
     path = [
       pkgs.rsync
