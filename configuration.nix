@@ -227,6 +227,21 @@
     };
   };
 
+  systemd.services.sync-mint-packages = {
+    script = ''
+      rsync -rlptH --safe-links --delete-delay --delay-updates rsync://mint-packages.c3sl.ufpr.br/mint-packages /data/mirror/mint-archive
+    '';
+    path = [
+      pkgs.rsync
+    ];
+    startAt = "hourly";
+    serviceConfig = {
+      Type = "oneshot";
+      User = config.users.users.rsync-client.name;
+      Group = config.users.users.rsync-client.group;
+    };
+  };
+
   services.nginx = {
     enable = true;
     virtualHosts."mirror.ufscar.br" = {
