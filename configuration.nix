@@ -118,6 +118,7 @@
     mosh
     tmux
     bmon
+    htop
     iotop
     wget
   ];
@@ -244,6 +245,9 @@
 
   services.nginx = {
     enable = true;
+    appendConfig = ''
+      worker_processes auto;
+    '';
     virtualHosts."mirror.ufscar.br" = {
       enableACME = true;
       forceSSL = false;
