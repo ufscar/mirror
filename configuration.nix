@@ -248,14 +248,17 @@
       defaultLocations = {
         "/" = {
           extraConfig = ''
-            autoindex on;
-            autoindex_exact_size off;
+            fancyindex on;
+            fancyindex_exact_size off;
           '';
         };
       };
     in
     {
       enable = true;
+      additionalModules = [
+        pkgs.nginxModules.fancyindex
+      ];
       statusPage = true;
       appendConfig = ''
         worker_processes auto;
