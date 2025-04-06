@@ -243,19 +243,9 @@
     };
   };
 
-  services.nginx = {
-    enable = true;
-    statusPage = true;
-    appendConfig = ''
-      worker_processes auto;
-    '';
-    virtualHosts."mirror.ufscar.br" = {
-      enableACME = true;
-      forceSSL = false;
-      addSSL = true;
-      default = true;
-      root = "/data/mirror";
-      locations = {
+  services.nginx =
+    let
+      defaultLocations = {
         "/" = {
           extraConfig = ''
             autoindex on;
@@ -263,22 +253,29 @@
           '';
         };
       };
-    };
-    virtualHosts."br.mirror.archlinuxarm.org" = {
-      enableACME = false;  # change later
-      forceSSL = false;
-      addSSL = false;  # change later
-      root = "/data/mirror/archlinux-arm";
-      locations = {
-        "/" = {
-          extraConfig = ''
-            autoindex on;
-            autoindex_exact_size off;
-          '';
-        };
+    in
+    {
+      enable = true;
+      statusPage = true;
+      appendConfig = ''
+        worker_processes auto;
+      '';
+      virtualHosts."mirror.ufscar.br" = {
+        enableACME = true;
+        forceSSL = false;
+        addSSL = true;
+        default = true;
+        root = "/data/mirror";
+        locations = defaultLocations;
+      };
+      virtualHosts."br.mirror.archlinuxarm.org" = {
+        enableACME = false;  # change later
+        forceSSL = false;
+        addSSL = false;  # change later
+        root = "/data/mirror/archlinux-arm";
+        locations = defaultLocations;
       };
     };
-  };
   security.acme.defaults.email = "admin@ufscar.br";
   security.acme.acceptTerms = true;
 
