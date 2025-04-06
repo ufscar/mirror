@@ -250,6 +250,7 @@
           extraConfig = ''
             fancyindex on;
             fancyindex_exact_size off;
+            fancyindex_footer ${./templates/footer.html} local;
           '';
         };
       };
