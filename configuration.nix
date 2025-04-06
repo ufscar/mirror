@@ -245,6 +245,7 @@
 
   services.nginx = {
     enable = true;
+    statusPage = true;
     appendConfig = ''
       worker_processes auto;
     '';
@@ -285,6 +286,12 @@
     enable = true;
     apiKeyFile = "/etc/datadog.key";
     site = "us5.datadoghq.com";
+    checks = {
+      nginx = {
+        init_config = { };
+        instances = [ { nginx_status_url = "http://localhost/nginx_status/"; } ];
+      };
+    };
   };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
