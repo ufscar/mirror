@@ -243,6 +243,36 @@
     };
   };
 
+  systemd.services.sync-opensuse = {
+    script = ''
+      rsync -rlptH --safe-links --delete-after --delay-updates --delete-excluded \
+        --exclude='debug/' \
+        --exclude='history/' \
+        --exclude='slowroll/' \
+        --include="15.6/" \
+        --exclude="15.*/" \
+        --exclude='source/' \
+        --exclude='src-*/' \
+        --exclude='/update/**/src/' \
+        --exclude='iso/' \
+        --exclude='appliances/' \
+        --exclude='images/' \
+        --include='/ports/aarch64/' \
+        --include='/ports/riscv/' \
+        --exclude='/ports/*/' \
+        rsync://rsync.opensuse.org/opensuse-full-really-everything/opensuse/ /data/mirror/opensuse
+    '';
+    path = [
+      pkgs.rsync
+    ];
+    startAt = "*-*-* *:00,15,30,45:*";
+    serviceConfig = {
+      Type = "oneshot";
+      User = config.users.users.rsync-client.name;
+      Group = config.users.users.rsync-client.group;
+    };
+  };
+
   services.nginx =
     let
       defaultLocations = {
