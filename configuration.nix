@@ -85,6 +85,14 @@
   };
   users.groups.rsync = {};
 
+  users.users.rsyncro = {
+    isSystemUser = true;
+    home = "/data/mirror";
+    createHome = false;
+    group = "rsyncro";
+  };
+  users.groups.rsyncro = {};
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.matias = {
     isNormalUser = true;
@@ -312,6 +320,23 @@
     };
   security.acme.defaults.email = "admin@ufscar.br";
   security.acme.acceptTerms = true;
+
+  services.rsyncd = {
+    enable = true;
+    settings = {
+      opensuse = {
+        "read only" = true;
+        "hosts allow" = "195.135.220.0/22 2001:067c:2178::/48";
+        path = "/data/mirror/opensuse";
+      };
+      global = {
+        "max connections" = 4;
+        "use chroot" = true;
+        uid = config.users.users.rsyncro.name;
+        gid = config.users.users.rsyncro.group;
+      };
+    };
+  };
 
   services.datadog-agent = {
     enable = true;
