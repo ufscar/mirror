@@ -76,14 +76,14 @@
   #   keyMap = "us";
   #   useXkbConfig = true; # use xkb.options in tty.
   # };
-  users.users.rsync-client = {
+  users.users.rsync = {
     isSystemUser = true;
     home = "/data/mirror";
     createHome = true;
     homeMode = "755";
-    group = "rsync-client";
+    group = "rsync";
   };
-  users.groups.rsync-client = {};
+  users.groups.rsync = {};
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.matias = {
@@ -163,8 +163,8 @@
     startAt = "*-*-* *:*:00,15,30,45";
     serviceConfig = {
       Type = "oneshot";
-      User = config.users.users.rsync-client.name;
-      Group = config.users.users.rsync-client.group;
+      User = config.users.users.rsync.name;
+      Group = config.users.users.rsync.group;
     };
   };
 
@@ -178,8 +178,8 @@
     startAt = "minutely";
     serviceConfig = {
       Type = "oneshot";
-      User = config.users.users.rsync-client.name;
-      Group = config.users.users.rsync-client.group;
+      User = config.users.users.rsync.name;
+      Group = config.users.users.rsync.group;
     };
   };
 
@@ -193,8 +193,8 @@
     startAt = "minutely";
     serviceConfig = {
       Type = "oneshot";
-      User = config.users.users.rsync-client.name;
-      Group = config.users.users.rsync-client.group;
+      User = config.users.users.rsync.name;
+      Group = config.users.users.rsync.group;
     };
   };
 
@@ -208,8 +208,8 @@
     startAt = "hourly";
     serviceConfig = {
       Type = "oneshot";
-      User = config.users.users.rsync-client.name;
-      Group = config.users.users.rsync-client.group;
+      User = config.users.users.rsync.name;
+      Group = config.users.users.rsync.group;
     };
   };
 
@@ -223,8 +223,8 @@
     startAt = "hourly";
     serviceConfig = {
       Type = "oneshot";
-      User = config.users.users.rsync-client.name;
-      Group = config.users.users.rsync-client.group;
+      User = config.users.users.rsync.name;
+      Group = config.users.users.rsync.group;
     };
   };
 
@@ -238,8 +238,8 @@
     startAt = "hourly";
     serviceConfig = {
       Type = "oneshot";
-      User = config.users.users.rsync-client.name;
-      Group = config.users.users.rsync-client.group;
+      User = config.users.users.rsync.name;
+      Group = config.users.users.rsync.group;
     };
   };
 
@@ -268,8 +268,8 @@
     startAt = "*-*-* *:00,15,30,45:*";
     serviceConfig = {
       Type = "oneshot";
-      User = config.users.users.rsync-client.name;
-      Group = config.users.users.rsync-client.group;
+      User = config.users.users.rsync.name;
+      Group = config.users.users.rsync.group;
     };
   };
 
