@@ -238,7 +238,7 @@
 
   systemd.services.sync-mint-packages = {
     script = ''
-      rsync -rlptH --safe-links --delete-delay --delay-updates rsync://mint-packages.c3sl.ufpr.br/mint-packages /data/mirror/mint-archive
+      rsync -rlptH --safe-links --delete-delay --delay-updates rsync-packages.linuxmint.com::packages /data/mirror/mint-archive
     '';
     path = [
       pkgs.rsync
