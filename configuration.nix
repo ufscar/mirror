@@ -286,6 +286,7 @@
       defaultLocations = {
         "/" = {
           extraConfig = ''
+            access_log /var/log/nginx/access.log custom;
             fancyindex on;
             fancyindex_exact_size off;
             fancyindex_footer ${./templates/footer.html} local;
@@ -317,6 +318,10 @@
         root = "/data/mirror/archlinux-arm";
         locations = defaultLocations;
       };
+      commonHttpConfig = ''
+        log_format custom '$remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" "$http_user_agent" $host';
+      '';
     };
   security.acme.defaults.email = "admin@ufscar.br";
   security.acme.acceptTerms = true;
@@ -349,6 +354,7 @@
       };
     };
   };
+  users.users.datadog.extraGroups = [ "nginx" ];  # read access to logs
 
   system.autoUpgrade = {
     enable = true;
