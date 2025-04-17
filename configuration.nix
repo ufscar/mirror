@@ -2,7 +2,7 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 {
   imports =
@@ -16,6 +16,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "mirror"; # Define your hostname.
+  networking.domain = "ufscar.br";
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   # networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
@@ -129,6 +130,7 @@
     htop
     iotop
     wget
+    inputs.archvsync.packages.${pkgs.system}.default
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -206,12 +208,36 @@
     };
   };
 
+  environment.etc."ftpsync/ftpsync.conf".text = ''
+    MIRRORNAME=mirror.ufscar.br
+
+    TO=/data/mirror/debian/
+    RSYNC_HOST=debian.c3sl.ufpr.br
+    RSYNC_PATH="debian"
+
+    INFO_MAINTAINER="CITI <citi@ufscar.br>"
+    INFO_SPONSOR="Federal University of Sao Carlos <https://ufscar.br>"
+    INFO_COUNTRY=BR
+    INFO_LOCATION="Sao Carlos, Sao Paulo"
+    INFO_THROUGHPUT=20Gb
+
+    LOGDIR=/var/log/ftpsync
+  '';
+
+  systemd.tmpfiles.rules = [
+    # Syntax:
+    # "d <path> <permissions> <user> <group> <age> <additional-flags>"
+    "d /var/log/ftpsync 0755 rsync rsync - -"
+  ];
+
   systemd.services.sync-debian = {
     script = ''
-      rsync -rlptH --safe-links --delete-delay --delay-updates rsync://debian.c3sl.ufpr.br/debian /data/mirror/debian
+      ftpsync
     '';
     path = [
+      inputs.archvsync.packages.${pkgs.system}.default
       pkgs.rsync
+      pkgs.hostname
     ];
     startAt = "hourly";
     serviceConfig = {
@@ -323,7 +349,7 @@
                           '$status $body_bytes_sent "$http_referer" "$http_user_agent" $host';
       '';
     };
-  security.acme.defaults.email = "admin@ufscar.br";
+  security.acme.defaults.email = "citi@ufscar.br";
   security.acme.acceptTerms = true;
 
   services.rsyncd = {
