@@ -16,7 +16,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = inputs@{ self, nixpkgs, deploy-rs, ... }: {
+  outputs = inputs@{ self, nixpkgs, deploy-rs, ... }: let
+    systems = ["x86_64-linux" "aarch64-linux"];
+    forAllSystems = nixpkgs.lib.genAttrs systems;
+  in {
     nixosConfigurations = {
       mirror = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
@@ -27,6 +30,7 @@
         specialArgs = {inherit inputs;};
       };
     };
+
     deploy.nodes = let
       activate = kind: config: deploy-rs.lib.${config.pkgs.system}.activate.${kind} config;
     in {
@@ -39,5 +43,13 @@
         };
       };
     };
+
+    apps = forAllSystems (system: rec {
+      deploy = {
+        type = "app";
+        program = nixpkgs.lib.getExe nixpkgs.legacyPackages.${system}.deploy-rs;
+      };
+      default = deploy;
+    });
   };
 }
