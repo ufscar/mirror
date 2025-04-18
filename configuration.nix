@@ -396,6 +396,13 @@
   };
   users.users.datadog.extraGroups = [ "nginx" ];  # read access to logs
 
+
+  system.autoUpgrade = {
+    enable = true;
+    flake = "github:ufscar/mirror";
+    dates = "minutely";
+  };
+
   nix = {
     settings.auto-optimise-store = true;
     settings.experimental-features = [ "nix-command" "flakes" "ca-derivations" ];
