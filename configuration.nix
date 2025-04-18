@@ -389,11 +389,6 @@
   };
   users.users.datadog.extraGroups = [ "nginx" ];  # read access to logs
 
-  system.autoUpgrade = {
-    enable = true;
-    flake = "/etc/nixos";
-    dates = "hourly";
-  };
   nix = {
     settings.auto-optimise-store = true;
     settings.experimental-features = [ "nix-command" "flakes" "ca-derivations" ];

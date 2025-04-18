@@ -1,0 +1,28 @@
+name: "Deploy"
+on:
+  push:
+    branches: [ main ]
+concurrency:
+  group: ${{ github.workflow }}
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: Prod
+    steps:
+      - uses: actions/checkout@v3
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v16
+        with:
+          name: ufscar
+          authToken: '${{ secrets.CACHIX_KEY }}'
+      - uses: webfactory/ssh-agent@v0.6.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+      - name: Configurar hosts SSH conhecidos
+        run: |
+          cat <<EOF >> ~/.ssh/known_hosts
+          mirror.ufscar.br ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFX7HteJxB9uDgTuf+aXToAtNkBuW3C8QQoZV7Z9N8xR
+          EOF
+      - name: Deploy
+        run: nix run .#deploy -- --skip-checks
