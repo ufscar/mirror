@@ -282,9 +282,8 @@
       rsync -rlptH --safe-links --delete-after --delay-updates --delete-excluded \
         --exclude='debug/' \
         --exclude='history/' \
-        --exclude='slowroll/' \
-        --include="15.6/" \
-        --exclude="15.*/" \
+        --include='15.6/' \
+        --exclude='15.*/' \
         --exclude='source/' \
         --exclude='src-*/' \
         --exclude='/update/**/src/' \
