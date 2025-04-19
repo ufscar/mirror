@@ -434,6 +434,7 @@
     enable = true;
     flake = "github:ufscar/mirror";
     dates = "hourly";
+    flags = ["--refresh"];
   };
 
   nix = {
