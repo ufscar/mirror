@@ -442,7 +442,7 @@
     settings.experimental-features = [ "nix-command" "flakes" "ca-derivations" ];
     gc = {
       automatic = true;
-      dates = "weekly";
+      dates = "*:0/10"; # Every 10 minutes
       options = "--delete-older-than 7d";
     };
   };
