@@ -164,6 +164,24 @@
     settings.PasswordAuthentication = false;
     settings.KbdInteractiveAuthentication = false;
   };
+  services.wstunnel = {
+    enable = true;
+    servers = {
+      ssh-tunnel = {
+        enableHTTPS = false;
+        listen = {
+          host = "127.0.0.1";
+          port = 8080;
+        };
+        restrictTo = [
+          {
+            host = "127.0.0.1";
+            port = 22;
+          }
+        ];
+      };
+    };
+  };
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
@@ -358,6 +376,18 @@
         addSSL = false;  # change later
         root = "/data/mirror/archlinux-arm";
         locations = defaultLocations;
+      };
+      virtualHosts."mirror-admin.gelos.club" = {
+        enableACME = true;
+        forceSSL = false;
+        addSSL = true;
+        "/" = {
+          proxyWebsockets = true;
+          proxyPass = "http://127.0.0.1:8080";
+          extraConfig = ''
+            access_log /dev/null;
+          '';
+        };
       };
       commonHttpConfig = ''
         log_format custom '$remote_addr - $remote_user [$time_local] "$request" '
