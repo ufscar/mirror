@@ -420,10 +420,31 @@
     enable = true;
     apiKeyFile = "/etc/datadog.key";
     site = "us5.datadoghq.com";
+    extraConfig = {
+      logs_enabled = true;
+    };
     checks = {
       nginx = {
         init_config = { };
-        instances = [ { nginx_status_url = "http://localhost/nginx_status/"; } ];
+        instances = [
+          {
+            nginx_status_url = "http://localhost/nginx_status/";
+            logs = [
+              {
+                type = "file";
+                path = "/var/log/nginx/access.log";
+                service = "nginx";
+                source = "nginx";
+              }
+              {
+                type = "file";
+                path = "/var/log/nginx/error.log";
+                service = "nginx";
+                source = "nginx";
+              }
+            ];
+          }
+        ];
       };
     };
   };
