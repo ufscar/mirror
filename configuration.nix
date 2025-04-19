@@ -321,6 +321,7 @@
     };
   };
 
+  systemd.extraConfig = "DefaultLimitNOFILE=8192";
   services.nginx =
     let
       defaultLocations = {
