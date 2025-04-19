@@ -381,12 +381,14 @@
         enableACME = true;
         forceSSL = false;
         addSSL = true;
-        "/" = {
-          proxyWebsockets = true;
-          proxyPass = "http://127.0.0.1:8080";
-          extraConfig = ''
-            access_log /dev/null;
-          '';
+        locations = {
+          "/" = {
+            proxyWebsockets = true;
+            proxyPass = "http://127.0.0.1:8080";
+            extraConfig = ''
+              access_log /dev/null;
+            '';
+          };
         };
       };
       commonHttpConfig = ''
