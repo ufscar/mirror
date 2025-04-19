@@ -431,7 +431,7 @@
   system.autoUpgrade = {
     enable = true;
     flake = "github:ufscar/mirror";
-    dates = "minutely";
+    dates = "hourly";
   };
 
   nix = {
