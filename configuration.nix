@@ -433,7 +433,7 @@
   system.autoUpgrade = {
     enable = true;
     flake = "github:ufscar/mirror";
-    dates = "hourly";
+    dates = "*:0/10"; # Every 10 minutes
     flags = ["--refresh"];
   };
 
@@ -442,7 +442,7 @@
     settings.experimental-features = [ "nix-command" "flakes" "ca-derivations" ];
     gc = {
       automatic = true;
-      dates = "*:0/10"; # Every 10 minutes
+      dates = "hourly";
       options = "--delete-older-than 7d";
     };
   };
