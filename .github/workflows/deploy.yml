@@ -24,5 +24,9 @@ jobs:
           cat <<EOF >> ~/.ssh/known_hosts
           mirror.ufscar.br ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFX7HteJxB9uDgTuf+aXToAtNkBuW3C8QQoZV7Z9N8xR
           EOF
+          cat <<EOF >> ~/.ssh/config
+          Host mirror.ufscar.br
+            ProxyCommand wstunnel client --log-lvl=off -L stdio://localhost:22 wss://mirror-admin.gelos.club
+          EOF
       - name: Deploy
         run: nix run .#deploy -- --skip-checks

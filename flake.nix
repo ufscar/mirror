@@ -35,9 +35,7 @@
       activate = kind: config: deploy-rs.lib.${config.pkgs.system}.activate.${kind} config;
     in {
       mirror = {
-        # FIXME
-        # hostname = "mirror.ufscar.br";
-        hostname = "200.133.233.210";
+        hostname = "mirror.ufscar.br";
         sshUser = "deploy";
         profiles.system = {
           user = "root";
