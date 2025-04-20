@@ -459,8 +459,11 @@
   };
 
   nix = {
-    settings.auto-optimise-store = true;
-    settings.experimental-features = [ "nix-command" "flakes" "ca-derivations" ];
+    settings = {
+      trusted-users = [ "root" "deploy" ];
+      auto-optimise-store = true;
+      experimental-features = [ "nix-command" "flakes" "ca-derivations" ];
+    };
     gc = {
       automatic = true;
       dates = "hourly";
