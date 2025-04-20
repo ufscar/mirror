@@ -47,7 +47,12 @@
     apps = forAllSystems (system: rec {
       deploy = {
         type = "app";
-        program = nixpkgs.lib.getExe nixpkgs.legacyPackages.${system}.deploy-rs;
+        program = let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in pkgs.lib.getExe (pkgs.writeShellScriptBin "deploy" ''
+          export PATH="${pkgs.wstunnel}/bin:$PATH"
+          exec ${pkgs.deploy-rs}/bin/deploy "$@"
+        '');
       };
       default = deploy;
     });
