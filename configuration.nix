@@ -226,7 +226,9 @@
       done
     '';
     path = [
+      pkgs.diffutils
       pkgs.rsync
+      pkgs.curl
     ];
     startAt = "minutely";
     serviceConfig = {
