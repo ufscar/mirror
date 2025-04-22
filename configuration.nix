@@ -203,7 +203,7 @@
       pkgs.rsync
       pkgs.curl
     ];
-    startAt = "*-*-* *:*:00,15,30,45";
+    startAt = "*:*:0/15";
     serviceConfig = {
       Type = "oneshot";
       User = config.users.users.rsync.name;
@@ -274,7 +274,7 @@
       pkgs.curl
       pkgs.gawk
     ];
-    startAt = "*-*-* *:00,15,30,45:*";
+    startAt = "*:0/15";
     serviceConfig = {
       Type = "oneshot";
       User = config.users.users.rsync.name;
@@ -300,7 +300,7 @@
       pkgs.rsync
       pkgs.curl
     ];
-    startAt = "*-*-* *:00,15,30,45:*";
+    startAt = "*:0/15";
     serviceConfig = {
       Type = "oneshot";
       User = config.users.users.rsync.name;
@@ -344,7 +344,7 @@
     path = [
       pkgs.rsync
     ];
-    startAt = "*-*-* *:00,15,30,45:*";
+    startAt = "*:0/15";
     serviceConfig = {
       Type = "oneshot";
       User = config.users.users.rsync.name;
