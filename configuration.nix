@@ -213,7 +213,17 @@
 
   systemd.services.sync-archlinux-arm = {
     script = ''
-      rsync -rlptH --safe-links --delete-delay --delay-updates rsync://de3.mirror.archlinuxarm.org/archlinux-arm /data/mirror/archlinux-arm
+      target="/data/mirror/archlinux-arm"
+      rsync_url="rsync://de3.mirror.archlinuxarm.org/archlinux-arm"
+      upstream_url="https://de3.mirror.archlinuxarm.org"
+
+      for dir in aarch64 armv7h os; do
+        local_sync="$target/$dir/sync"
+        remote_sync="$upstream_url/$dir/sync"
+        if [[ ! -f "$local_sync" ]] || ! diff -b <(curl -Ls "$remote_sync") "$local_sync" >/dev/null; then
+          rsync -rlptH --safe-links --delete-delay --delay-updates "$rsync_url/$dir/" "$target/$dir/"
+        fi
+      done
     '';
     path = [
       pkgs.rsync
