@@ -265,14 +265,14 @@
 
   systemd.services.sync-debian = {
     script = ''
-      ftpsync
+      ftpsync-cron
     '';
     path = [
       inputs.archvsync.packages.${pkgs.system}.default
       pkgs.rsync
       pkgs.hostname
     ];
-    startAt = "hourly";
+    startAt = "*-*-* *:00,15,30,45:*";
     serviceConfig = {
       Type = "oneshot";
       User = config.users.users.rsync.name;
