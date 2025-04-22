@@ -284,12 +284,23 @@
 
   systemd.services.sync-ubuntu = {
     script = ''
-      rsync -rlptH --safe-links --delete-delay --delay-updates rsync://ubuntu.c3sl.ufpr.br/ubuntu /data/mirror/ubuntu
+      target="/data/mirror/ubuntu"
+      rsync_url="rsync://ubuntu.c3sl.ufpr.br/ubuntu"
+      local_trace="$target/ubuntu/project/trace/mirror.ufscar.br"
+      upstream_trace="$target/ubuntu/project/trace/br.archive.ubuntu.com"
+      upstream_trace_url="https://ubuntu.c3sl.ufpr.br/ubuntu/project/trace/br.archive.ubuntu.com"
+
+      if [[ ! -f "$local_trace" ]] || ! diff -b <(curl -Ls "$upstream_trace_url") "$local_trace" >/dev/null; then
+        rsync -rlptH --safe-links --delete-delay --delay-updates "$rsync_url" "$target"
+      fi
+      cp "$upstream_trace" "$local_trace"
     '';
     path = [
+      pkgs.diffutils
       pkgs.rsync
+      pkgs.curl
     ];
-    startAt = "hourly";
+    startAt = "*-*-* *:00,15,30,45:*";
     serviceConfig = {
       Type = "oneshot";
       User = config.users.users.rsync.name;
