@@ -272,6 +272,7 @@
       pkgs.rsync
       pkgs.hostname
       pkgs.curl
+      pkgs.gawk
     ];
     startAt = "*-*-* *:00,15,30,45:*";
     serviceConfig = {
