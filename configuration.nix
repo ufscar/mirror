@@ -271,6 +271,7 @@
       inputs.archvsync.packages.${pkgs.system}.default
       pkgs.rsync
       pkgs.hostname
+      pkgs.curl
     ];
     startAt = "*-*-* *:00,15,30,45:*";
     serviceConfig = {
