@@ -132,7 +132,7 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIOdYhRgFSM9pStYXvgMQuZXBSWTS8ud2l8pAokXsspH"
     ];
   };
-  security.sudo.extraConfig = "deploy ALL = (ALL) NOPASSWD: ALL";
+  security.sudo.extraConfig = "%wheel ALL = (ALL) NOPASSWD: ALL";
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
