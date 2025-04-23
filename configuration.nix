@@ -285,7 +285,7 @@
       pkgs.curl
       pkgs.gawk
     ];
-    startAt = "*:0/15";
+    startAt = "*:0/5";
     serviceConfig = {
       Type = "oneshot";
       User = config.users.users.rsync.name;
@@ -311,7 +311,7 @@
       pkgs.rsync
       pkgs.curl
     ];
-    startAt = "*:0/15";
+    startAt = "*:0/5";
     serviceConfig = {
       Type = "oneshot";
       User = config.users.users.rsync.name;
