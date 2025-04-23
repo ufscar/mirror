@@ -143,7 +143,6 @@
     tmux
     bmon
     htop
-    iotop
     wget
     inputs.archvsync.packages.${pkgs.system}.default
   ];
