@@ -1,0 +1,41 @@
+name: "Update Nixpkgs"
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  update-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_TOKEN }}  # Personal Access Token with repo access
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v16
+        with:
+          name: ufscar
+          authToken: ${{ secrets.CACHIX_KEY }}
+
+      - name: Update nixpkgs input
+        id: update
+        run: |
+          nix flake update --update-input nixpkgs
+          git add flake.lock
+          
+          # Check if changes exist
+          if ! git diff --cached --exit-code; then
+            echo "changes_detected=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push changes
+        if: steps.update.outputs.changes_detected == 'true'
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git commit -m "chore: update nixpkgs"
+          git push
