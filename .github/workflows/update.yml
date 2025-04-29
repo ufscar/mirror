@@ -2,7 +2,7 @@ name: "Update Nixpkgs"
 
 on:
   schedule:
-    - cron: '35 8 * * *'
+    - cron: '45 11 * * *'
 
 jobs:
   update-and-deploy:
