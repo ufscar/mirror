@@ -429,7 +429,7 @@
       sections = {
         opensuse = {
           "read only" = true;
-          "hosts allow" = "195.135.220.0/22 2001:067c:2178::/48";
+          "hosts allow" = "195.135.220.0/22 2001:067c:2178::/48 ::1/128";
           path = "/data/mirror/opensuse";
         };
       };
