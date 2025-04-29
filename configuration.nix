@@ -426,12 +426,14 @@
   services.rsyncd = {
     enable = true;
     settings = {
-      opensuse = {
-        "read only" = true;
-        "hosts allow" = "195.135.220.0/22 2001:067c:2178::/48";
-        path = "/data/mirror/opensuse";
+      sections = {
+        opensuse = {
+          "read only" = true;
+          "hosts allow" = "195.135.220.0/22 2001:067c:2178::/48";
+          path = "/data/mirror/opensuse";
+        };
       };
-      global = {
+      globalSection = {
         "max connections" = 4;
         "use chroot" = true;
         uid = config.users.users.rsyncro.name;
