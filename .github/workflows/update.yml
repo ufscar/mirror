@@ -1,30 +1,30 @@
 name: "Update Nixpkgs"
 
 on:
-  schedule:
-    - cron: '0 8 * * *'
+  schedule:
+    - cron: '35 8 * * *'
 
 jobs:
-  update-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GH_TOKEN }}
+  update-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_TOKEN }}
 
-      - name: Install Nix
-        uses: cachix/install-nix-action@v31
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
 
-      - name: Setup Cachix
-        uses: cachix/cachix-action@v16
-        with:
-          name: ufscar
-          authToken: ${{ secrets.CACHIX_KEY }}
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v16
+        with:
+          name: ufscar
+          authToken: ${{ secrets.CACHIX_KEY }}
 
-      - name: Update nixpkgs input
-        run: |
-          nix flake update nixpkgs
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git commit -m "chore: update nixpkgs" flake.lock && git push || echo "Nothing to commit"
+      - name: Update nixpkgs input
+        run: |
+          nix flake update nixpkgs
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git commit -m "chore: update nixpkgs" flake.lock && git push || echo "Nothing to commit"
