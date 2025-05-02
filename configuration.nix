@@ -482,6 +482,8 @@
     age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
     secrets."datadog-agent/apiKey" = {
       restartUnits = [ "datadog-agent.service" ];
+      owner = config.users.users.datadog.name;
+      group = config.users.users.datadog.group;
     };
   };
 
