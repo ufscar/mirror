@@ -9,6 +9,7 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./disko-config.nix
+      inputs.sops-nix.nixosModules.sops
     ];
 
   # Use the systemd-boot EFI boot loader.
@@ -444,7 +445,7 @@
 
   services.datadog-agent = {
     enable = true;
-    apiKeyFile = "/etc/datadog.key";
+    apiKeyFile = "/run/secrets/datadog-agent/apiKey";
     site = "us5.datadoghq.com";
     extraConfig = {
       logs_enabled = true;
@@ -476,6 +477,13 @@
   };
   users.users.datadog.extraGroups = [ "nginx" ];  # read access to logs
 
+  sops = {
+    defaultSopsFile = ./secrets.yml;
+    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+    secrets."datadog-agent/apiKey" = {
+      restartUnits = [ "datadog-agent.service" ];
+    };
+  };
 
   system.autoUpgrade = {
     enable = true;

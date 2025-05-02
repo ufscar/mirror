@@ -1,0 +1,12 @@
+keys:
+  - &admin_matias age12d8evr28nm3rfs8asf79hlvrdnqh8ezsf932scvytasmpxrqyfgsx20thv
+  - &admin_misterio 7088C7421873E0DB97FF17C2245CAB70B4C225E9
+  - &server_mirror age1kw40wykqlj9avc4cgf8gc4mv866j9d00twhsdxk6xuae8jag34rqzusqzy
+creation_rules:
+  - path_regex: secrets\.yml$
+    key_groups:
+    - age:
+      - *admin_matias
+      - *server_mirror
+      pgp:
+      - *admin_misterio

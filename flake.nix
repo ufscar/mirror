@@ -7,6 +7,10 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    sops-nix = {
+      url = "github:mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     archvsync = {
       url = "github:LuNeder/archvsync-nix";
       inputs.nixpkgs.follows = "nixpkgs";
