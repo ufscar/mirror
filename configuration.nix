@@ -485,13 +485,6 @@
     };
   };
 
-  system.autoUpgrade = {
-    enable = true;
-    flake = "github:ufscar/mirror";
-    dates = "*:0/10"; # Every 10 minutes
-    flags = ["--refresh"];
-  };
-
   nix = {
     settings = {
       trusted-users = [ "root" "deploy" ];
