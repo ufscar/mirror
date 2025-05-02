@@ -445,7 +445,7 @@
 
   services.datadog-agent = {
     enable = true;
-    apiKeyFile = "/run/secrets/datadog-agent/apiKey";
+    apiKeyFile = config.sops.secrets."datadog-agent/apiKey".path;
     site = "us5.datadoghq.com";
     extraConfig = {
       logs_enabled = true;
