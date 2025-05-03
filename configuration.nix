@@ -525,7 +525,7 @@
     };
     gc = {
       automatic = true;
-      dates = "hourly";
+      dates = "daily";
       options = "--delete-older-than 7d";
     };
   };
