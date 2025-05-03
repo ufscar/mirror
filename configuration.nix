@@ -247,7 +247,7 @@
         local_sync="$target/$dir/sync"
         remote_sync="$upstream_url/$dir/sync"
         if [[ ! -f "$local_sync" ]] || ! diff -b <(curl -Ls "$remote_sync") "$local_sync" >/dev/null; then
-          rsync -rlptH --safe-links --delete-delay --delay-updates "$rsync_url/$dir/" "$target/$dir/"
+          rsync -rlptH --safe-links --delete-delay --delay-updates --timeout=600 --contimeout=60 --no-motd --quiet "$rsync_url/$dir/" "$target/$dir/"
         fi
       done
     '';
@@ -266,7 +266,7 @@
 
   systemd.services.sync-archriscv = {
     script = ''
-      rsync -rlptH --safe-links --delete-delay --delay-updates rsync://archriscv.felixc.at/archriscv /data/mirror/archriscv
+      rsync -rlptH --safe-links --delete-delay --delay-updates --timeout=600 --contimeout=60 --no-motd --quiet rsync://archriscv.felixc.at/archriscv /data/mirror/archriscv
     '';
     path = [
       pkgs.rsync
@@ -323,7 +323,7 @@
       upstream_trace_url="https://ubuntu.c3sl.ufpr.br/ubuntu/project/trace/br.archive.ubuntu.com"
 
       if [[ ! -f "$local_trace" ]] || ! diff -b <(curl -Ls "$upstream_trace_url") "$local_trace" >/dev/null; then
-        rsync -rlptH --safe-links --delete-delay --delay-updates "$rsync_url" "$target"
+        rsync -rlptH --safe-links --delete-delay --delay-updates --timeout=600 --contimeout=60 --no-motd --quiet "$rsync_url" "$target"
       fi
       cp "$upstream_trace" "$local_trace"
     '';
@@ -342,7 +342,7 @@
 
   systemd.services.sync-mint-packages = {
     script = ''
-      rsync -rlptH --safe-links --delete-delay --delay-updates rsync-packages.linuxmint.com::packages /data/mirror/mint-archive
+      rsync -rlptH --safe-links --delete-delay --delay-updates --timeout=600 --contimeout=60 --no-motd --quiet rsync-packages.linuxmint.com::packages /data/mirror/mint-archive
     '';
     path = [
       pkgs.rsync
@@ -357,7 +357,7 @@
 
   systemd.services.sync-opensuse = {
     script = ''
-      rsync -rlptH --safe-links --delete-after --delay-updates --delete-excluded \
+      rsync -rlptH --safe-links --delete-after --delay-updates --delete-excluded --timeout=600 --contimeout=60 --no-motd --quiet \
         --exclude='debug/' \
         --exclude='history/' \
         --include='15.6/' \
