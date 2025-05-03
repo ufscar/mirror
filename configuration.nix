@@ -189,10 +189,35 @@
   # Or disable the firewall altogether.
   networking.firewall.enable = false;
 
+  systemd.tmpfiles.rules = [
+    # Syntax:
+    # "d <path> <permissions> <user> <group> <age> <additional-flags>"
+    "d /var/log/ftpsync 0755 rsync rsync - -"
+    "d /data/mirror/chaotic-aur 0755 syncthing syncthing - -"
+  ];
+
   services.syncthing = {
     enable = true;
     dataDir = "/home/syncthing";
     openDefaultPorts = false;
+    cert = "${./certs/syncthing.pem}";
+    key = config.sops.secrets."syncthing/key".path;
+    settings = {
+      folders = {
+        "/data/mirror/chaotic-aur" = {
+          id = "jhcrt-m2dra";
+          devices = [ "garuda" ];
+          type = "receiveonly";
+          order = "oldestFirst";
+        };
+      };
+      devices = {
+        garuda = {
+          id = "ZDHVMSP-EW4TMWX-DBH2W4P-HV5A6OY-BBEFABO-QTENANJ-RJ6GKNX-6KCG7QY";
+          introducer = true;
+        };
+      };
+    };
   };
   users.users.syncthing.homeMode = "755";
 
@@ -268,12 +293,6 @@
 
     LOGDIR=/var/log/ftpsync
   '';
-
-  systemd.tmpfiles.rules = [
-    # Syntax:
-    # "d <path> <permissions> <user> <group> <age> <additional-flags>"
-    "d /var/log/ftpsync 0755 rsync rsync - -"
-  ];
 
   systemd.services.sync-debian = {
     script = ''
@@ -484,6 +503,11 @@
       restartUnits = [ "datadog-agent.service" ];
       owner = config.users.users.datadog.name;
       group = config.users.users.datadog.group;
+    };
+    secrets."syncthing/key" = {
+      restartUnits = [ "syncthing.service" ];
+      owner = config.users.users.syncthing.name;
+      group = config.users.users.syncthing.group;
     };
   };
 
