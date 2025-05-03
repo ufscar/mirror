@@ -212,6 +212,7 @@
           ignorePerms = true;
         };
       };
+      overrideDevices = false;  # takes too long to activate if true
       devices = {
         garuda = {
           id = "ZDHVMSP-EW4TMWX-DBH2W4P-HV5A6OY-BBEFABO-QTENANJ-RJ6GKNX-6KCG7QY";
