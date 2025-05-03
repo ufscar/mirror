@@ -211,6 +211,7 @@
           type = "receiveonly";
           order = "oldestFirst";
           ignorePerms = true;
+          rescanIntervalS = 604800;
         };
       };
       devices = {
