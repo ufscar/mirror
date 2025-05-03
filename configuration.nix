@@ -202,6 +202,7 @@
     openDefaultPorts = false;
     cert = "${./certs/syncthing.pem}";
     key = config.sops.secrets."syncthing/key".path;
+    overrideDevices = false;  # takes too long to activate if true
     settings = {
       folders = {
         "/data/mirror/chaotic-aur" = {
@@ -212,7 +213,6 @@
           ignorePerms = true;
         };
       };
-      overrideDevices = false;  # takes too long to activate if true
       devices = {
         garuda = {
           id = "ZDHVMSP-EW4TMWX-DBH2W4P-HV5A6OY-BBEFABO-QTENANJ-RJ6GKNX-6KCG7QY";
