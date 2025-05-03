@@ -221,7 +221,6 @@
       };
     };
   };
-  users.users.syncthing.homeMode = "755";
 
   systemd.services.sync-archlinux = {
     script = lib.readFile ./scripts/sync-archlinux.sh;
