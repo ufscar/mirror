@@ -209,6 +209,7 @@
           devices = [ "garuda" ];
           type = "receiveonly";
           order = "oldestFirst";
+          ignorePerms = true;
         };
       };
       devices = {
