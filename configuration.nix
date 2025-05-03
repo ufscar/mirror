@@ -218,6 +218,10 @@
           id = "ZDHVMSP-EW4TMWX-DBH2W4P-HV5A6OY-BBEFABO-QTENANJ-RJ6GKNX-6KCG7QY";
           introducer = true;
         };
+        this = {
+          id = "43SSHD7-3LJDW5J-SLVW54I-IYWFWMF-ZIVLIEQ-4RXWCRI-MCN72R5-YJ2CJAH";
+          name = "mirror.ufscar.br";
+        };
       };
     };
   };
