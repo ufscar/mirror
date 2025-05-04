@@ -1,4 +1,4 @@
-name: "Update Nixpkgs"
+name: "Update flake inputs"
 
 on:
   schedule:
@@ -22,9 +22,9 @@ jobs:
           name: ufscar
           authToken: ${{ secrets.CACHIX_KEY }}
 
-      - name: Update nixpkgs input
+      - name: Update flake inputs
         run: |
-          nix flake update nixpkgs
+          nix flake update
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git commit -m "chore: update nixpkgs" flake.lock && git push || echo "Nothing to commit"
+          git commit -m "chore: update flake inputs" flake.lock && git push || echo "Nothing to commit"
