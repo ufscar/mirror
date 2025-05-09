@@ -41,6 +41,7 @@
       mirror = {
         hostname = "mirror.ufscar.br";
         sshUser = "deploy";
+        activationTimeout = 600;
         profiles.system = {
           user = "root";
           path = activate "nixos" self.outputs.nixosConfigurations.mirror;
