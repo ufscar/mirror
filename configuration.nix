@@ -182,6 +182,7 @@
       };
     };
   };
+  systemd.services.wstunnel-server-ssh-tunnel.restartIfChanged = false;  # avoid disconnection during CI deploy
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
