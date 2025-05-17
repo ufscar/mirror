@@ -241,6 +241,7 @@
       User = config.users.users.rsync.name;
       Group = config.users.users.rsync.group;
     };
+    restartIfChanged = false;
   };
 
   systemd.services.sync-archlinux-arm = {
@@ -268,6 +269,7 @@
       User = config.users.users.rsync.name;
       Group = config.users.users.rsync.group;
     };
+    restartIfChanged = false;
   };
 
   systemd.services.sync-archriscv = {
@@ -283,6 +285,7 @@
       User = config.users.users.rsync.name;
       Group = config.users.users.rsync.group;
     };
+    restartIfChanged = false;
   };
 
   environment.etc."ftpsync/ftpsync.conf".text = ''
@@ -318,6 +321,7 @@
       User = config.users.users.rsync.name;
       Group = config.users.users.rsync.group;
     };
+    restartIfChanged = false;
   };
 
   systemd.services.sync-ubuntu = {
@@ -344,6 +348,7 @@
       User = config.users.users.rsync.name;
       Group = config.users.users.rsync.group;
     };
+    restartIfChanged = false;
   };
 
   systemd.services.sync-mint-packages = {
@@ -359,6 +364,7 @@
       User = config.users.users.rsync.name;
       Group = config.users.users.rsync.group;
     };
+    restartIfChanged = false;
   };
 
   systemd.services.sync-opensuse = {
@@ -388,6 +394,7 @@
       User = config.users.users.rsync.name;
       Group = config.users.users.rsync.group;
     };
+    restartIfChanged = false;
   };
 
   systemd.extraConfig = "DefaultLimitNOFILE=8192";
