@@ -30,5 +30,7 @@ jobs:
           EOF
       - name: Logar endereços IP do Runner (para depuração de problemas de conexão)
         run: curl -s checkip.amazonaws.com
+      - name: Testar conectividade com o servidor
+        run: curl -s https://mirror.ufscar.br
       - name: Deploy
         run: nix run .#deploy -- --skip-checks
