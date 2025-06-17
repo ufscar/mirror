@@ -28,5 +28,9 @@ jobs:
           Host mirror.ufscar.br
             ProxyCommand wstunnel client --log-lvl=off -L stdio://localhost:22 wss://mirror-admin.gelos.club
           EOF
+      - name: Logar endereços IP do Runner (para depuração de problemas de conexão)
+        run: |
+          curl -4 ifconfig.co
+          curl -6 ifconfig.co
       - name: Deploy
         run: nix run .#deploy -- --skip-checks
