@@ -6,6 +6,7 @@ concurrency:
   group: ${{ github.workflow }}
 jobs:
   deploy:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     environment:
       name: Prod
