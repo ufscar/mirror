@@ -34,6 +34,6 @@ jobs:
       - name: Testar conectividade com o servidor
         run: curl -s https://mirror.ufscar.br
       - name: Testar wstunnel
-        run: (sleep 3; echo) | wstunnel client --log-lvl=TRACE -L stdio://localhost:22 wss://mirror-admin.gelos.club
+        run: (sleep 3; echo) | nix shell .#deploy -c wstunnel client --log-lvl=TRACE -L stdio://localhost:22 wss://mirror-admin.gelos.club
       - name: Deploy
         run: nix run .#deploy -- --skip-checks
