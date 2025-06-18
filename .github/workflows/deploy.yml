@@ -27,13 +27,6 @@ jobs:
           cat <<EOF >> ~/.ssh/config
           Host mirror.ufscar.br
             ProxyCommand wstunnel client --log-lvl=off -L stdio://localhost:22 wss://mirror-admin.gelos.club
-            LogLevel DEBUG
           EOF
-      - name: Logar endereços IP do Runner (para depuração de problemas de conexão)
-        run: curl -s checkip.amazonaws.com
-      - name: Testar conectividade com o servidor
-        run: curl -s https://mirror.ufscar.br
-      - name: Testar wstunnel
-        run: (sleep 3; echo) | nix shell nixpkgs#wstunnel -c wstunnel client --log-lvl=TRACE -L stdio://localhost:22 wss://mirror-admin.gelos.club
       - name: Deploy
         run: nix run .#deploy -- --skip-checks
