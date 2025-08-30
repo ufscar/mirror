@@ -397,7 +397,7 @@
     restartIfChanged = false;
   };
 
-  systemd.extraConfig = "DefaultLimitNOFILE=8192";
+  systemd.settings.Manager.DefaultLimitNOFILE = 8192;
   services.nginx =
     let
       defaultLocations = {
