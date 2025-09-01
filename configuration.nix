@@ -476,8 +476,16 @@
     };
   };
 
-  services.datadog-agent = {
+nixpkgs.overlays = [
+    (final: prev: {
+      pythonPackages = prev.python311Packages; 
+    }
+    )
+  ];  
+
+services.datadog-agent = {
     enable = true;
+    package = (pkgs.datadog-agent.override {pythonPackages = pkgs.python311Packages;}); # https://github.com/NixOS/nixpkgs/issues/418555
     apiKeyFile = config.sops.secrets."datadog-agent/apiKey".path;
     site = "us5.datadoghq.com";
     extraConfig = {
