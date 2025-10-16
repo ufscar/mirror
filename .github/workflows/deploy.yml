@@ -11,9 +11,6 @@ jobs:
     environment:
       name: Prod
     env:
-      NIX_CONFIG: |
-        experimental-features = nix-command flakes
-        eval-store = daemon
     steps:
       - uses: actions/checkout@v3
       - uses: cachix/install-nix-action@v31
@@ -33,11 +30,5 @@ jobs:
           Host mirror.ufscar.br
             ProxyCommand wstunnel client --log-lvl=off -L stdio://localhost:22 wss://mirror-admin.gelos.club
           EOF
-      - name: Build NixOS system
-        run: nix build .#nixosConfigurations.mirror.config.system.build.toplevel
       - name: Deploy
-        env:
-          NIX_CONFIG: |
-            experimental-features = nix-command flakes
-            eval-store = daemon
         run: nix run .#deploy -- --skip-checks
