@@ -29,5 +29,9 @@ jobs:
           Host mirror.ufscar.br
             ProxyCommand wstunnel client --log-lvl=off -L stdio://localhost:22 wss://mirror-admin.gelos.club
           EOF
+      - name: Build NixOS system
+        run: nix build .#nixosConfigurations.mirror.config.system.build.toplevel
+      - name: Push system build to Cachix
+        run: cachix push ufscar $(nix path-info .#nixosConfigurations.mirror.config.system.build.toplevel)
       - name: Deploy
         run: nix run .#deploy -- --skip-checks
