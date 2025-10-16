@@ -13,7 +13,9 @@ jobs:
     env:
     steps:
       - uses: actions/checkout@v3
-      - uses: cachix/install-nix-action@v31
+      - uses: nixbuild/nix-quick-install-action@v34
+        with:
+          nix_version: 2.31.2
       - uses: cachix/cachix-action@v16
         with:
           name: ufscar
