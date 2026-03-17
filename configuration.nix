@@ -288,6 +288,22 @@
     restartIfChanged = false;
   };
 
+  systemd.services.sync-archlinux32 = {
+    script = ''
+      rsync -rlptH --safe-links --delete-delay --delay-updates --timeout=600 --contimeout=60 --no-motd --quiet rsync://buildmaster.archlinux32.org/archlinux32 /data/mirror/archlinux32
+    '';
+    path = [
+      pkgs.rsync
+    ];
+    startAt = "minutely";
+    serviceConfig = {
+      Type = "oneshot";
+      User = config.users.users.rsync.name;
+      Group = config.users.users.rsync.group;
+    };
+    restartIfChanged = false;
+  };
+
   environment.etc."ftpsync/ftpsync.conf".text = ''
     MIRRORNAME=mirror.ufscar.br
 
