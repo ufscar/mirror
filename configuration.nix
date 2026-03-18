@@ -396,6 +396,9 @@
         --exclude='iso/' \
         --exclude='appliances/' \
         --exclude='images/' \
+        --exclude='/factory/' \
+        --exclude='/distribution/' \
+        --exclude='/update/' \
         --include='/ports/aarch64/' \
         --include='/ports/riscv/' \
         --exclude='/ports/*/' \
