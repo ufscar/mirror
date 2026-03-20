@@ -289,10 +289,9 @@
   };
 
   systemd.services.sync-archlinux32 = {
-    script = ''
-      rsync -rlptH --safe-links --delete-delay --delay-updates --timeout=600 --contimeout=60 --no-motd --quiet rsync://buildmaster.archlinux32.org/archlinux32 /data/mirror/archlinux32
-    '';
+    script = lib.readFile ./scripts/sync-archlinux32.sh;
     path = [
+      pkgs.diffutils
       pkgs.rsync
     ];
     startAt = "minutely";
