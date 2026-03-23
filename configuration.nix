@@ -199,6 +199,7 @@
 
   services.syncthing = {
     enable = true;
+    package = inputs.syncthing-nixpkgs.legacyPackages.${pkgs.system}.syncthing;
     dataDir = "/home/syncthing";
     openDefaultPorts = false;
     cert = "${./certs/syncthing.pem}";
