@@ -442,6 +442,7 @@
         enableACME = true;
         forceSSL = false;
         addSSL = true;
+        quic = true;
         default = true;
         root = "/data/mirror";
         locations = defaultLocations;
