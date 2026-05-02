@@ -446,6 +446,11 @@
         default = true;
         root = "/data/mirror";
         locations = defaultLocations;
+        extraConfig = ''
+          ssl_early_data on;
+          quic_gso on;
+          add_header Alt-Svc 'h3=":443"; ma=86400';
+        '';
       };
       virtualHosts."br.mirror.archlinuxarm.org" = {
         enableACME = false;  # change later
