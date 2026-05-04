@@ -442,14 +442,9 @@
         enableACME = true;
         forceSSL = false;
         addSSL = true;
-        quic = true;
         default = true;
         root = "/data/mirror";
         locations = defaultLocations;
-        extraConfig = ''
-          ssl_early_data on;
-          quic_gso on;
-        '';
       };
       virtualHosts."br.mirror.archlinuxarm.org" = {
         enableACME = false;  # change later
