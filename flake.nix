@@ -36,7 +36,7 @@
     };
 
     deploy.nodes = let
-      activate = kind: config: deploy-rs.lib.${config.pkgs.system}.activate.${kind} config;
+      activate = kind: config: deploy-rs.lib.${config.pkgs.stdenv.hostPlatform.system}.activate.${kind} config;
     in {
       mirror = {
         hostname = "mirror.ufscar.br";

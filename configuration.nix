@@ -145,7 +145,7 @@
     bmon
     htop
     wget
-    inputs.archvsync.packages.${pkgs.system}.default
+    inputs.archvsync.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -324,7 +324,7 @@
       ftpsync-cron
     '';
     path = [
-      inputs.archvsync.packages.${pkgs.system}.default
+      inputs.archvsync.packages.${pkgs.stdenv.hostPlatform.system}.default
       pkgs.rsync
       pkgs.hostname
       pkgs.curl
