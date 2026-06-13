@@ -415,6 +415,22 @@
     restartIfChanged = false;
   };
 
+  systemd.services.sync-termux-packages = {
+    script = ''
+      rsync -rlptH --safe-links --delete-delay --delay-updates --timeout=600 --contimeout=60 --no-motd --quiet rsync://packages.termux.dev/termux /data/mirror/termux
+    '';
+    path = [
+      pkgs.rsync
+    ];
+    startAt = "hourly";
+    serviceConfig = {
+      Type = "oneshot";
+      User = config.users.users.rsync.name;
+      Group = config.users.users.rsync.group;
+    };
+    restartIfChanged = false;
+  };
+
   systemd.settings.Manager.DefaultLimitNOFILE = 8192;
   services.nginx =
     let
