@@ -307,8 +307,7 @@
     MIRRORNAME=mirror.ufscar.br
 
     TO=/data/mirror/debian/
-    # Temporário: usar o OSL enquanto debian.c3sl.ufpr.br não volta a sincronizar.
-    RSYNC_HOST=ftp-osl.osuosl.org
+    RSYNC_HOST=debian.c3sl.ufpr.br
     RSYNC_PATH="debian"
 
     INFO_MAINTAINER="CITI <citi@ufscar.br>"
