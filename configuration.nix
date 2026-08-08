@@ -14,22 +14,23 @@
 
   nixpkgs.overlays = [
     (final: _: {
-      datadog-integrations-core = final.callPackage (
-        builtins.toFile "datadog-integrations-core.nix" (
-          builtins.replaceStrings
-            [ "        doCheck = false;" ]
-            [
-              ''
-                        doCheck = false;
+      datadog-integrations-core = extraIntegrations:
+        final.callPackage (
+          builtins.toFile "datadog-integrations-core.nix" (
+            builtins.replaceStrings
+              [ "        doCheck = false;" ]
+              [
+                ''
+                          doCheck = false;
 
-                        # Solução provisória para o pythonMetadataCheckHook até o nixpkgs
-                        # alinhar os pnames aos nomes declarados pelas integrações Datadog.
-                        dontCheckPythonMetadata = true;
-              ''
-            ]
-            (builtins.readFile "${inputs.nixpkgs}/pkgs/tools/networking/dd-agent/integrations-core.nix")
-        )
-      ) { };
+                          # Solução provisória para o pythonMetadataCheckHook até o nixpkgs
+                          # alinhar os pnames aos nomes declarados pelas integrações Datadog.
+                          dontCheckPythonMetadata = true;
+                ''
+              ]
+              (builtins.readFile "${inputs.nixpkgs}/pkgs/tools/networking/dd-agent/integrations-core.nix")
+          )
+        ) { inherit extraIntegrations; };
     })
   ];
 
