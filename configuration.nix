@@ -272,7 +272,10 @@ in
     openDefaultPorts = false;
     cert = "${./certs/syncthing.pem}";
     key = config.sops.secrets."syncthing/key".path;
-    overrideDevices = false;  # takes too long to activate if true
+    # Preserve itens adicionados manualmente quando a configuração declarativa
+    # for reativada.
+    overrideDevices = false;
+    overrideFolders = false;
     # Ative para reconstruir declarativamente dispositivos e pastas, por exemplo
     # durante a recuperação do servidor. A aplicação dessa configuração pode demorar.
     settings = lib.mkIf enableDeclarativeSyncthingConfig {
