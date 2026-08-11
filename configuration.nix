@@ -5,6 +5,8 @@
 { config, lib, pkgs, inputs, ... }:
 
 let
+  enableDeclarativeSyncthingConfig = false;
+
   restartNginxIfNeeded = pkgs.writeShellApplication {
     name = "restart-nginx-if-needed";
     runtimeInputs = [
@@ -271,7 +273,9 @@ in
     cert = "${./certs/syncthing.pem}";
     key = config.sops.secrets."syncthing/key".path;
     overrideDevices = false;  # takes too long to activate if true
-    settings = {
+    # Ative para reconstruir declarativamente dispositivos e pastas, por exemplo
+    # durante a recuperação do servidor. A aplicação dessa configuração pode demorar.
+    settings = lib.mkIf enableDeclarativeSyncthingConfig {
       folders = {
         "/data/mirror/chaotic-aur" = {
           id = "jhcrt-m2dra";
