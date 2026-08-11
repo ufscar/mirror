@@ -6,7 +6,7 @@ concurrency:
   group: ${{ github.workflow }}
 jobs:
   deploy:
-    timeout-minutes: 15
+    timeout-minutes: 75
     runs-on: ubuntu-latest
     environment:
       name: Prod
@@ -33,3 +33,5 @@ jobs:
           EOF
       - name: Deploy
         run: nix run .#deploy -- --skip-checks
+      - name: Reiniciar nginx se o binário mudou
+        run: ssh deploy@mirror.ufscar.br sudo -n /run/current-system/sw/bin/restart-nginx-if-needed

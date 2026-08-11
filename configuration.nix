@@ -4,6 +4,50 @@
 
 { config, lib, pkgs, inputs, ... }:
 
+let
+  restartNginxIfNeeded = pkgs.writeShellApplication {
+    name = "restart-nginx-if-needed";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.systemd
+    ];
+    text = ''
+      service="nginx.service"
+      pid="$(systemctl show "$service" --property=MainPID --value)"
+
+      case "$pid" in
+        ""|0|*[!0-9]*)
+          echo "MainPID inválido para $service: $pid" >&2
+          exit 1
+          ;;
+      esac
+
+      running="$(readlink -f "/proc/$pid/exe")"
+      exec_start="$(systemctl show "$service" --property=ExecStart --value)"
+      exec_start_pattern='^\{[[:space:]]path=([^ ;]+)'
+
+      if [[ "$exec_start" =~ $exec_start_pattern ]]; then
+        configured="$(readlink -f "''${BASH_REMATCH[1]}")"
+      else
+        echo "Não foi possível extrair o executável configurado de: $exec_start" >&2
+        exit 1
+      fi
+
+      if [[ "$running" == "$configured" ]]; then
+        echo "O nginx já está executando o binário configurado."
+        exit 0
+      fi
+
+      systemd-run \
+        --quiet \
+        --collect \
+        --on-active=10s \
+        "$(command -v systemctl)" restart "$service"
+
+      echo "Restart do nginx agendado: $running -> $configured"
+    '';
+  };
+in
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -15,22 +59,22 @@
   nixpkgs.overlays = [
     (final: _: {
       datadog-integrations-core = extraIntegrations:
-        final.callPackage (
-          builtins.toFile "datadog-integrations-core.nix" (
-            builtins.replaceStrings
-              [ "        doCheck = false;" ]
-              [
-                ''
-                          doCheck = false;
-
-                          # Solução provisória para o pythonMetadataCheckHook até o nixpkgs
-                          # alinhar os pnames aos nomes declarados pelas integrações Datadog.
-                          dontCheckPythonMetadata = true;
-                ''
-              ]
-              (builtins.readFile "${inputs.nixpkgs}/pkgs/tools/networking/dd-agent/integrations-core.nix")
-          )
-        ) { inherit extraIntegrations; };
+        let
+          python3Packages = final.python3Packages // {
+            buildPythonPackage = args:
+              final.python3Packages.buildPythonPackage (
+                args
+                // {
+                  # Solução provisória até o nixpkgs alinhar os pnames aos nomes
+                  # declarados pelas integrações Datadog.
+                  dontCheckPythonMetadata = true;
+                }
+              );
+          };
+        in
+        final.callPackage
+          "${inputs.nixpkgs}/pkgs/tools/networking/dd-agent/integrations-core.nix"
+          { inherit extraIntegrations python3Packages; };
     })
   ];
 
@@ -167,6 +211,7 @@
     bmon
     htop
     wget
+    restartNginxIfNeeded
     inputs.archvsync.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
@@ -469,6 +514,7 @@
     in
     {
       enable = true;
+      enableReload = true;
       additionalModules = [
         pkgs.nginxModules.fancyindex
       ];
@@ -510,6 +556,7 @@
                           '$status $body_bytes_sent "$http_referer" "$http_user_agent" $host';
       '';
     };
+  systemd.services.nginx.reloadIfChanged = true;
   security.acme.defaults.email = "citi@ufscar.br";
   security.acme.acceptTerms = true;
 
