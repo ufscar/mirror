@@ -34,4 +34,4 @@ jobs:
       - name: Deploy
         run: nix run .#deploy -- --skip-checks
       - name: Reiniciar nginx se o binário mudou
-        run: ssh deploy@mirror.ufscar.br sudo -n /run/current-system/sw/bin/restart-nginx-if-needed
+        run: nix shell nixpkgs#wstunnel --command ssh deploy@mirror.ufscar.br sudo -n /run/current-system/sw/bin/restart-nginx-if-needed
