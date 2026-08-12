@@ -30,11 +30,14 @@
 target="${ARCH_MIRROR_TARGET:-/data/mirror/archlinux/}"
 state_dir="${ARCH_MIRROR_STATE_DIR:-${STATE_DIRECTORY:-/var/lib/sync-archlinux}}"
 
-# Uma sincronização saudável normalmente termina em menos de um minuto. O
-# limite total impede que tráfego muito lento mantenha o serviço bloqueado
-# indefinidamente, mesmo quando ainda há atividade e o --timeout do rsync não
-# é acionado.
-transfer_timeout="${ARCH_MIRROR_TRANSFER_TIMEOUT:-300}"
+# Não há limite para a duração total: uma atualização grande pode transferir
+# dados por horas. O watchdog exige progresso mínimo após uma tolerância
+# inicial e em cada janela subsequente, distinguindo volume legítimo de uma
+# conexão que permanece aberta com vazão praticamente nula.
+progress_grace="${ARCH_MIRROR_PROGRESS_GRACE:-180}"
+progress_interval="${ARCH_MIRROR_PROGRESS_INTERVAL:-60}"
+progress_min_bytes="${ARCH_MIRROR_PROGRESS_MIN_BYTES:-4194304}"
+progress_poll="${ARCH_MIRROR_PROGRESS_POLL:-10}"
 cooldown_seconds="${ARCH_MIRROR_COOLDOWN:-1800}"
 
 # Lockfile path
@@ -70,9 +73,12 @@ upstream_http_urls=(
 [ ! -d "${target}" ] && mkdir -p "${target}"
 mkdir -p "$state_dir"
 
-if [[ ! $transfer_timeout =~ ^[1-9][0-9]*$ ||
+if [[ ! $progress_grace =~ ^[1-9][0-9]*$ ||
+      ! $progress_interval =~ ^[1-9][0-9]*$ ||
+      ! $progress_min_bytes =~ ^[1-9][0-9]*$ ||
+      ! $progress_poll =~ ^[1-9][0-9]*$ ||
       ! $cooldown_seconds =~ ^[1-9][0-9]*$ ]]; then
-  echo 'Os tempos de sincronização e cooldown precisam ser inteiros positivos' >&2
+  echo 'Os parâmetros do watchdog e do cooldown precisam ser inteiros positivos' >&2
   exit 1
 fi
 
@@ -84,28 +90,109 @@ fi
 # not affected by https://github.com/WayneD/rsync/issues/192
 #find "${target}" -name '.~tmp~' -exec rm -r {} +
 
-rsync_cmd() {
-  local deadline=$1
-  shift
-  local -a cmd=(rsync -rlptH --safe-links --delete-delay --delay-updates
+declare -a rsync_argv
+
+build_rsync_command() {
+  local quiet=${1:-1}
+  rsync_argv=(rsync -rlptH --safe-links --delete-delay --delay-updates
     "--timeout=60" "--contimeout=15" --no-motd)
 
   if stty &>/dev/null; then
-    cmd+=(-h -v --progress)
-  else
-    cmd+=(--quiet)
+    rsync_argv+=(-h -v --progress)
+  elif ((quiet)); then
+    rsync_argv+=(--quiet)
   fi
 
   if ((bwlimit>0)); then
-    cmd+=("--bwlimit=$bwlimit")
+    rsync_argv+=("--bwlimit=$bwlimit")
   fi
+}
+
+rsync_cmd() {
+  local deadline=$1
+  shift
+  build_rsync_command 1
 
   if ((deadline > 0)); then
     timeout --signal=TERM --kill-after=30s "${deadline}s" \
-      "${cmd[@]}" "$@"
+      "${rsync_argv[@]}" "$@"
   else
-    "${cmd[@]}" "$@"
+    "${rsync_argv[@]}" "$@"
   fi
+}
+
+latest_progress() {
+  local log=$1
+  awk 'BEGIN { RS = "\\r|\\n" }
+    /^[[:space:]]*[0-9,]+[[:space:]]+[0-9]+%/ {
+      gsub(",", "", $1)
+      bytes = $1
+    }
+    END { print bytes + 0 }' "$log"
+}
+
+stop_transfer() {
+  local pid=$1 remaining
+  kill -TERM "$pid" 2>/dev/null || return
+  for ((remaining=30; remaining>0; remaining--)); do
+    kill -0 "$pid" 2>/dev/null || return
+    sleep 1
+  done
+  kill -KILL "$pid" 2>/dev/null || true
+}
+
+rsync_with_progress_watchdog() {
+  local log pid start now checkpoint_time checkpoint_bytes bytes status
+  local stalled=0
+  log="$state_dir/rsync-progress.$$"
+  : > "$log"
+  build_rsync_command 0
+
+  # --progress2 fornece um contador agregado de bytes. --outbuf=N garante que
+  # o watchdog o receba sem esperar o preenchimento do buffer de saída.
+  "${rsync_argv[@]}" --info=progress2 --outbuf=N "$@" > "$log" 2>&1 &
+  pid=$!
+  start=$(date +%s)
+  checkpoint_time=$start
+  checkpoint_bytes=0
+
+  while kill -0 "$pid" 2>/dev/null; do
+    sleep "$progress_poll"
+    kill -0 "$pid" 2>/dev/null || break
+    now=$(date +%s)
+    bytes=$(latest_progress "$log")
+
+    if ((checkpoint_time == start)); then
+      ((now - start >= progress_grace)) || continue
+    else
+      ((now - checkpoint_time >= progress_interval)) || continue
+    fi
+
+    if ((bytes - checkpoint_bytes < progress_min_bytes)); then
+      printf 'Progresso insuficiente: %s bytes em %ss\n' \
+        "$((bytes - checkpoint_bytes))" "$((now - checkpoint_time))" >&2
+      stalled=1
+      stop_transfer "$pid"
+      break
+    fi
+
+    checkpoint_time=$now
+    checkpoint_bytes=$bytes
+  done
+
+  if wait "$pid"; then
+    status=0
+  else
+    status=$?
+  fi
+
+  if ((status != 0)); then
+    tr '\r' '\n' < "$log" >&2
+  fi
+  rm -f -- "$log"
+
+  ((stalled == 0)) || return 124
+  return "$status"
 }
 
 probe_upstream() {
@@ -330,12 +417,12 @@ if ! tty -s && ((source_lastupdate == local_lastupdate)); then
 fi
 
 while :; do
-  printf 'Sincronizando a partir de %s (%s), com limite de %ss\n' \
-    "$source_name" "$source_url" "$transfer_timeout"
+  printf 'Sincronizando a partir de %s (%s), com watchdog de progresso\n' \
+    "$source_name" "$source_url"
 
   if ! verify_rsync_marker "$source_index"; then
     mark_failed "$source_index" 'marcador rsync indisponível ou divergente do HTTP'
-  elif rsync_cmd "$transfer_timeout" \
+  elif rsync_with_progress_watchdog \
       --exclude='*.links.tar.gz*' \
       --exclude='/*-debug' \
       --exclude='/archive' \
@@ -355,8 +442,8 @@ while :; do
     mark_failed "$source_index" 'marcadores inválidos após a sincronização'
   else
     status=$?
-    if ((status == 124 || status == 137)); then
-      mark_failed "$source_index" "limite total de ${transfer_timeout}s excedido"
+    if ((status == 124)); then
+      mark_failed "$source_index" 'watchdog detectou progresso insuficiente'
     else
       mark_failed "$source_index" "rsync terminou com status $status"
     fi
