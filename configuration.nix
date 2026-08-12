@@ -314,6 +314,8 @@ in
       Type = "oneshot";
       User = config.users.users.rsync.name;
       Group = config.users.users.rsync.group;
+      StateDirectory = "sync-archlinux";
+      TimeoutStopSec = 45;
     };
     restartIfChanged = false;
   };
