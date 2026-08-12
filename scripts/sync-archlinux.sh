@@ -234,13 +234,14 @@ health_file="$state_dir/upstream-cooldowns"
 load_cooldowns() {
   local name until now
   now=$(date +%s)
-  [[ -f $health_file ]] || return
+  [[ -f $health_file ]] || return 0
 
   while read -r name until; do
     [[ $until =~ ^[0-9]+$ ]] || continue
     ((until > now)) || continue
     cooldowns[$name]=$until
   done < "$health_file"
+  return 0
 }
 
 save_cooldowns() {
