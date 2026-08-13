@@ -308,6 +308,7 @@ in
       pkgs.diffutils
       pkgs.rsync
       pkgs.curl
+      pkgs.gawk
     ];
     startAt = "*:*:0/15";
     serviceConfig = {

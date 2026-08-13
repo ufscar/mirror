@@ -143,7 +143,7 @@ stop_transfer() {
 
 rsync_with_progress_watchdog() {
   local log pid start now checkpoint_time checkpoint_bytes bytes status
-  local stalled=0
+  local stalled=0 watchdog_error=0
   log="$state_dir/rsync-progress.$$"
   : > "$log"
   build_rsync_command 0
@@ -160,7 +160,12 @@ rsync_with_progress_watchdog() {
     sleep "$progress_poll"
     kill -0 "$pid" 2>/dev/null || break
     now=$(date +%s)
-    bytes=$(latest_progress "$log")
+    if ! bytes=$(latest_progress "$log"); then
+      echo 'Falha interna ao interpretar o progresso do rsync; interrompendo a transferência' >&2
+      watchdog_error=1
+      stop_transfer "$pid"
+      break
+    fi
 
     if ((checkpoint_time == start)); then
       ((now - start >= progress_grace)) || continue
@@ -191,6 +196,9 @@ rsync_with_progress_watchdog() {
   fi
   rm -f -- "$log"
 
+  # Um erro do próprio watchdog não diz nada sobre a saúde do upstream. Use um
+  # status distinto para abortar a execução sem contaminar seu cooldown.
+  ((watchdog_error == 0)) || return 125
   ((stalled == 0)) || return 124
   return "$status"
 }
@@ -443,11 +451,18 @@ while :; do
     mark_failed "$source_index" 'marcadores inválidos após a sincronização'
   else
     status=$?
-    if ((status == 124)); then
-      mark_failed "$source_index" 'watchdog detectou progresso insuficiente'
-    else
-      mark_failed "$source_index" "rsync terminou com status $status"
-    fi
+    case $status in
+      124)
+        mark_failed "$source_index" 'watchdog detectou progresso insuficiente'
+        ;;
+      125)
+        echo 'A sincronização foi abortada por uma falha interna do watchdog' >&2
+        exit 1
+        ;;
+      *)
+        mark_failed "$source_index" "rsync terminou com status $status"
+        ;;
+    esac
   fi
 
   # Consulte novamente todos os marcadores: durante uma tentativa longa, os
