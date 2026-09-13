@@ -6,49 +6,6 @@
 
 let
   enableDeclarativeSyncthingConfig = false;
-
-  restartNginxIfNeeded = pkgs.writeShellApplication {
-    name = "restart-nginx-if-needed";
-    runtimeInputs = [
-      pkgs.coreutils
-      pkgs.systemd
-    ];
-    text = ''
-      service="nginx.service"
-      pid="$(systemctl show "$service" --property=MainPID --value)"
-
-      case "$pid" in
-        ""|0|*[!0-9]*)
-          echo "MainPID inválido para $service: $pid" >&2
-          exit 1
-          ;;
-      esac
-
-      running="$(readlink -f "/proc/$pid/exe")"
-      exec_start="$(systemctl show "$service" --property=ExecStart --value)"
-      exec_start_pattern='^\{[[:space:]]path=([^ ;]+)'
-
-      if [[ "$exec_start" =~ $exec_start_pattern ]]; then
-        configured="$(readlink -f "''${BASH_REMATCH[1]}")"
-      else
-        echo "Não foi possível extrair o executável configurado de: $exec_start" >&2
-        exit 1
-      fi
-
-      if [[ "$running" == "$configured" ]]; then
-        echo "O nginx já está executando o binário configurado."
-        exit 0
-      fi
-
-      systemd-run \
-        --quiet \
-        --collect \
-        --on-active=10s \
-        "$(command -v systemctl)" restart "$service"
-
-      echo "Restart do nginx agendado: $running -> $configured"
-    '';
-  };
 in
 {
   imports =
@@ -213,7 +170,6 @@ in
     bmon
     htop
     wget
-    restartNginxIfNeeded
     inputs.archvsync.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
@@ -251,7 +207,6 @@ in
       };
     };
   };
-  systemd.services.wstunnel-server-ssh-tunnel.restartIfChanged = false;  # avoid disconnection during CI deploy
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
@@ -524,7 +479,6 @@ in
     in
     {
       enable = true;
-      enableReload = true;
       additionalModules = [
         pkgs.nginxModules.fancyindex
       ];
@@ -566,7 +520,6 @@ in
                           '$status $body_bytes_sent "$http_referer" "$http_user_agent" $host';
       '';
     };
-  systemd.services.nginx.reloadIfChanged = true;
   security.acme.defaults.email = "citi@ufscar.br";
   security.acme.acceptTerms = true;
 

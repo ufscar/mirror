@@ -15,12 +15,8 @@
       url = "github:LuNeder/archvsync-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    deploy-rs = {
-      url = "github:serokell/deploy-rs";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
-  outputs = inputs@{ self, nixpkgs, deploy-rs, ... }: let
+  outputs = inputs@{ self, nixpkgs, ... }: let
     systems = ["x86_64-linux" "aarch64-linux"];
     forAllSystems = nixpkgs.lib.genAttrs systems;
   in {
@@ -35,29 +31,28 @@
       };
     };
 
-    deploy.nodes = let
-      activate = kind: config: deploy-rs.lib.${config.pkgs.stdenv.hostPlatform.system}.activate.${kind} config;
+    packages = forAllSystems (system: let
+      pkgs = nixpkgs.legacyPackages.${system};
     in {
-      mirror = {
-        hostname = "mirror.ufscar.br";
-        sshUser = "deploy";
-        activationTimeout = 3600;
-        profiles.system = {
-          user = "root";
-          path = activate "nixos" self.outputs.nixosConfigurations.mirror;
-        };
+      deploy-worker = pkgs.writeShellApplication {
+        name = "mirror-deploy-worker";
+        runtimeInputs = [ pkgs.coreutils pkgs.util-linux pkgs.systemd pkgs.nix pkgs.curl ];
+        text = builtins.readFile ./scripts/deploy-worker.sh;
       };
-    };
+    });
 
     apps = forAllSystems (system: rec {
       deploy = {
         type = "app";
         program = let
           pkgs = nixpkgs.legacyPackages.${system};
-        in pkgs.lib.getExe (pkgs.writeShellScriptBin "deploy" ''
-          export PATH="${pkgs.wstunnel}/bin:$PATH"
-          exec ${pkgs.deploy-rs}/bin/deploy "$@"
-        '');
+        in pkgs.lib.getExe (pkgs.writeShellApplication {
+          name = "deploy";
+          runtimeInputs = [ pkgs.nix pkgs.openssh pkgs.wstunnel pkgs.coreutils ];
+          text = ''
+            set -- ${self.nixosConfigurations.mirror.config.system.build.toplevel} ${self.packages.x86_64-linux.deploy-worker} "$@"
+          '' + builtins.readFile ./scripts/deploy.sh;
+        });
       };
       default = deploy;
     });

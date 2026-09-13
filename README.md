@@ -48,6 +48,39 @@ We welcome community contributions!
 - Join PATOS/GELOS meetings
 - Suggest new metrics or visualizations
 
+## Implantação e recuperação
+
+Execute `nix run .#deploy` na raiz do repositório. Para usar outra conta SSH,
+execute `nix run .#deploy -- matias@mirror.ufscar.br`. O destino precisa permitir
+`sudo -n`; a configuração SSH deve disponibilizar o túnel wstunnel, como no CI.
+
+O Nix compila o sistema e o worker antes de iniciar a implantação. O cliente
+copia os resultados e inicia uma unidade `mirror-deploy-<identificador>` no
+systemd do servidor, com logs no journal. O worker serializa as implantações,
+protege as duas configurações contra coleta de lixo e executa a ativação.
+Ele verifica nginx, Syncthing, Datadog e rsync, incluindo a API do Syncthing.
+O cliente reconecta por SSH e confirma a transação somente após essas verificações.
+
+Se a ativação falhar ou a confirmação não chegar em 120 segundos após a
+verificação de saúde, o worker reativa a configuração anterior e verifica os
+serviços novamente. A queda do túnel ou o cancelamento do CI não interrompe esse
+processo. Falhas de tarefas periódicas continuam sendo reportadas pela ativação;
+elas não são convertidas silenciosamente em sucesso.
+
+O cliente imprime o nome da unidade e o diretório da transação. Para diagnosticar:
+
+```sh
+sudo journalctl -u mirror-deploy-<identificador>
+sudo cat /run/mirror-deploy/<identificador>/status
+```
+
+Os estados finais são `committed`, `rolled-back` e `rollback-failed`. Nos dois
+últimos casos, o cliente retorna erro. Se ele perder acesso ao servidor, o estado
+remoto é a referência; não inicie outra implantação antes de verificá-lo.
+O limite de espera do cliente é 65 minutos e não encerra a unidade remota.
+Uma transação travada durante a própria ativação exige diagnóstico pelo journal;
+o prazo de confirmação começa depois da ativação, não limita sua duração.
+
 ## 🌐 Why "Free Meets Free"?
 - **Free Software**: We mirror only Free Software distributions
 - **Free Infrastructure**: Entire stack is Free Software
