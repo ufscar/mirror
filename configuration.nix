@@ -323,6 +323,7 @@ in
   systemd.services.sync-archlinux32 = {
     script = lib.readFile ./scripts/sync-archlinux32.sh;
     path = [
+      pkgs.curl
       pkgs.diffutils
       pkgs.rsync
     ];
