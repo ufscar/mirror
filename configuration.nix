@@ -340,7 +340,7 @@ in
     MIRRORNAME=mirror.ufscar.br
 
     TO=/data/mirror/debian/
-    RSYNC_HOST=debian.c3sl.ufpr.br
+    RSYNC_HOST=ftp-osl.osuosl.org
     RSYNC_PATH="debian"
 
     INFO_MAINTAINER="CITI <citi@ufscar.br>"
