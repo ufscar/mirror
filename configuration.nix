@@ -6,6 +6,14 @@
 
 let
   enableDeclarativeSyncthingConfig = false;
+  archvsync = inputs.archvsync.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
+    # Limita a consulta do trace para que uma conexão travada não bloqueie o timer.
+    postPatch = (old.postPatch or "") + ''
+      substituteInPlace bin/ftpsync-cron \
+        --replace-fail 'http://''${RSYNC_HOST}' 'https://''${RSYNC_HOST}' \
+        --replace-fail 'curl --silent' 'curl --connect-timeout 5 --max-time 20 --silent'
+    '';
+  });
 in
 {
   imports =
@@ -170,7 +178,7 @@ in
     bmon
     htop
     wget
-    inputs.archvsync.packages.${pkgs.stdenv.hostPlatform.system}.default
+    archvsync
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -340,7 +348,7 @@ in
     MIRRORNAME=mirror.ufscar.br
 
     TO=/data/mirror/debian/
-    RSYNC_HOST=ftp-osl.osuosl.org
+    RSYNC_HOST=debian.snt.utwente.nl
     RSYNC_PATH="debian"
 
     INFO_MAINTAINER="CITI <citi@ufscar.br>"
@@ -357,13 +365,13 @@ in
       ftpsync-cron
     '';
     path = [
-      inputs.archvsync.packages.${pkgs.stdenv.hostPlatform.system}.default
+      archvsync
       pkgs.rsync
       pkgs.hostname
       pkgs.curl
       pkgs.gawk
     ];
-    startAt = "*:0/5";
+    startAt = "minutely";
     serviceConfig = {
       Type = "oneshot";
       User = config.users.users.rsync.name;
@@ -371,6 +379,8 @@ in
     };
     restartIfChanged = false;
   };
+
+  systemd.timers.sync-debian.timerConfig.AccuracySec = "1s";
 
   systemd.services.sync-ubuntu = {
     script = ''
