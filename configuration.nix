@@ -494,9 +494,8 @@ in
         pkgs.nginxModules.fancyindex
       ];
       statusPage = true;
-      appendConfig = ''
-        worker_processes auto;
-      '';
+      # nixpkgs >= 2026-10-20 emite `worker_processes auto;` por padrão
+      # (services.nginx.workerProcesses); appendConfig aqui duplicaria a diretiva.
       virtualHosts."mirror.ufscar.br" = {
         enableACME = true;
         forceSSL = false;
