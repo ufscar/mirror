@@ -48,6 +48,12 @@ in
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  # Bloqueia a cadeia de escalada local do nginx2root enquanto o kernel
+  # ainda não possui uma correção para a vulnerabilidade SCTP divulgada.
+  boot.blacklistedKernelModules = [ "sctp" ];
+  boot.extraModprobeConfig = ''
+    install sctp /run/current-system/sw/bin/false
+  '';
 
   networking.hostName = "mirror"; # Define your hostname.
   networking.domain = "ufscar.br";
@@ -490,6 +496,15 @@ in
     in
     {
       enable = true;
+      # O nixos-unstable fixado ainda contém 1.30.6. Remover este override
+      # quando o canal incorporar o nginx stable corrigido.
+      package = pkgs.nginxStable.overrideAttrs (_: {
+        version = "1.30.7";
+        src = pkgs.fetchurl {
+          url = "https://nginx.org/download/nginx-1.30.7.tar.gz";
+          hash = "sha256-JWW1yDcFDpWPcPsPc8SOK8pFQq00n9NW9G+wxyYQvG4=";
+        };
+      });
       additionalModules = [
         pkgs.nginxModules.fancyindex
       ];
@@ -500,6 +515,8 @@ in
         enableACME = true;
         forceSSL = false;
         addSSL = true;
+        # Mitigação temporária para CVE-2026-123007 e CVE-2026-123633.
+        http2 = false;
         default = true;
         root = "/data/mirror";
         locations = defaultLocations;
@@ -515,6 +532,8 @@ in
         enableACME = true;
         forceSSL = false;
         addSSL = true;
+        # Mitigação temporária para CVE-2026-123007 e CVE-2026-123633.
+        http2 = false;
         locations = {
           "/" = {
             proxyWebsockets = true;
