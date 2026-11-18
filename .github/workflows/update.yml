@@ -18,6 +18,9 @@ jobs:
         with:
           name: ufscar
           authToken: ${{ secrets.CACHIX_KEY }}
+          # Evita concorrência pelo lock global durante a migração do store
+          # recém-criado no runner hospedado.
+          useDaemon: false
 
       - name: Update flake inputs
         run: |

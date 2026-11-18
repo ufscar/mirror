@@ -19,6 +19,9 @@ jobs:
         with:
           name: ufscar
           authToken: '${{ secrets.CACHIX_KEY }}'
+          # Evita concorrência pelo lock global durante a migração do store
+          # recém-criado no runner hospedado.
+          useDaemon: false
       - uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
