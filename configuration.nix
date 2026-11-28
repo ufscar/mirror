@@ -496,15 +496,6 @@ in
     in
     {
       enable = true;
-      # O nixos-unstable fixado ainda contém 1.30.6. Remover este override
-      # quando o canal incorporar o nginx stable corrigido.
-      package = pkgs.nginxStable.overrideAttrs (_: {
-        version = "1.30.7";
-        src = pkgs.fetchurl {
-          url = "https://nginx.org/download/nginx-1.30.7.tar.gz";
-          hash = "sha256-JWW1yDcFDpWPcPsPc8SOK8pFQq00n9NW9G+wxyYQvG4=";
-        };
-      });
       additionalModules = [
         pkgs.nginxModules.fancyindex
       ];
